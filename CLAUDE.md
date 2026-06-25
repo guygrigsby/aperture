@@ -49,6 +49,14 @@ it.
   The two failure modes of AI-written code: near-identical functions or repeated
   literals that should be factored, and logic put in the wrong layer or
   reimplementing something that exists. Dedup and re-home before committing.
+- **Security-review every diff that touches an auth, identity, secret, or trust
+  boundary before merge.** A fresh-context adversarial pass (a separate
+  subagent, not the author) hunting fail-open paths, identity spoofing, value or
+  secret leakage, and info disclosure. Verify each finding rather than trust it:
+  agent reviewers carry their own false positives, the build is the arbiter. For
+  agent-generated security code this is mandatory, it is how the production bar
+  holds. This repo's authz core got exactly that pass, and its findings are in
+  the PR threads.
 - **Check for existing libraries before building from scratch.** Order: deps
   already in the project, stdlib, then a maintained registry package. State the
   chosen library or why none fit.
@@ -71,3 +79,20 @@ ornament. Applies to commits, comments, docs and PR text in this repo.
 Commits and PRs carry no `Co-Authored-By` trailers and no "Generated with" or
 tool-attribution footers. (The README's "Built with agents" section is a
 deliberate, separate POV write-up, not boilerplate attribution.)
+
+## Tooling (the plugins behind this)
+
+Built with Claude Code, disciplined by these public plugins. Two of them I wrote:
+
+- [ddd](https://github.com/guygrigsby/claude-plugins) (mine): domain-driven
+  design for large changes. The bounded contexts, ubiquitous language and
+  anti-corruption layer in this repo come from it.
+- [my-voice](https://github.com/guygrigsby/claude-plugins) (mine): builds a
+  writing-voice corpus from real email/PR/blog history; the docs and PR prose
+  are drafted through it.
+- [superpowers](https://github.com/anthropics/claude-plugins-official):
+  brainstorming, written plans, TDD, and subagent-driven execution with review
+  checkpoints.
+- [ponytail](https://github.com/DietrichGebert/ponytail): lazy-senior-dev
+  discipline. Stdlib and native before dependencies, shortest working diff, no
+  speculative abstractions.
