@@ -1,0 +1,9 @@
+{
+  "users": {
+    "you@example.com": ["resource:read", "resource:admin"],
+    "teammate@example.com": ["resource:read"]
+  },
+  "tags": {
+    "ci": ["resource:read"]
+  }
+}
