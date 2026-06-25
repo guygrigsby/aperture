@@ -21,9 +21,10 @@ access control wrapped around MCP.
 The server embeds `tsnet`, so it only listens on the tailnet. For each session
 it resolves the caller once from `WhoIs(remoteAddr)` and binds the tools to that
 principal, so no tool can accept a caller-supplied identity (ambient identity,
-see `docs/adr/0001-identity-is-ambient.md`). Each tool authorizes through a pure
-domain core (`internal/authz`) that imports nothing from Tailscale; vendor types
-stop at the adapter (`internal/tailnet`). Design: `docs/specs/`.
+see [docs/adr/0001-identity-is-ambient.md](docs/adr/0001-identity-is-ambient.md)).
+Each tool authorizes through a pure domain core (`internal/authz`) that imports
+nothing from Tailscale; vendor types stop at the adapter (`internal/tailnet`).
+Design: [docs/specs/](docs/specs/).
 
 ## Run
 
@@ -57,7 +58,8 @@ make test            # go test ./... && go vet ./...
 ```
 
 To watch the real `tsnet` + `WhoIs` path live on your own tailnet, see
-`integration/README.md` (opt-in, sandboxed, runs on disposable tagged nodes).
+[integration/README.md](integration/README.md) (opt-in, sandboxed, runs on
+disposable tagged nodes).
 
 ## Plug it into your agent
 
@@ -119,6 +121,19 @@ Where they failed, and how it got caught:
 - A separate agent reviewed the security core and found four real issues
   (`whoami` not failing closed, a malformed cap grant falling open, the missing
   spoofed-identity test, an unaudited list path). All fixed, each with a test.
+- A second review agent (a different model) caught a semantics bug the others
+  missed: an authoritative empty cap grant (`caps: []`) was being overridden by
+  the local fallback policy, a fail-open relative to the operator's intent.
+  Diverse reviewers surface what one reviewer's blind spot hides.
+- Applying the integration ACL stanza as a whole-file policy replace dropped
+  tailnet connectivity (the policy API has no merge endpoint). Caught the hard
+  way, the network went down. Anything that mutates live infra needs
+  add-not-replace and a backup first.
+- The test harness leaked: `go run` execs a child binary that does not die when
+  its parent is killed, so each run orphaned a server and left its ephemeral
+  tailnet node online until a stack of them had piled up. Caught by watching the
+  node list, fixed at the root (run the built binary so the kill signal lands).
+  An agent's test scaffolding can quietly pollute real infrastructure.
 
 The discipline that made that work: TDD with the deny path written first,
 discrete commits, a pinned SDK compiled in CI, and an adversarial review pass
@@ -126,6 +141,7 @@ whose findings I verified rather than trusted.
 
 ## More
 
-- Operating it and the path to production: `PRODUCTION.md`
-- Why identity is ambient: `docs/adr/0001-identity-is-ambient.md`
-- Live integration test: `integration/README.md`
+- Operating it and the path to production: [PRODUCTION.md](PRODUCTION.md)
+- Why identity is ambient: [docs/adr/0001-identity-is-ambient.md](docs/adr/0001-identity-is-ambient.md)
+- Live integration test: [integration/README.md](integration/README.md)
+- Design spec: [docs/specs/2026-06-24-identity-aware-mcp-design.md](docs/specs/2026-06-24-identity-aware-mcp-design.md)
