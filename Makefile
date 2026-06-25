@@ -4,8 +4,12 @@
 # tsnet state dir); `make exercise` reads it. Override with APERTURE_ADDR_FILE.
 ADDR_FILE ?= tsnet-state/addr
 
+# Build and run the binary (not `go run`): interactive Ctrl-C is already safe
+# since it signals the whole process group, but running the binary directly
+# matches the integration runner and removes any go-run-orphan footgun if this
+# is ever backgrounded and killed by PID.
 run:
-	go run ./cmd/aperture-mcp
+	go build -o aperture-mcp ./cmd/aperture-mcp && ./aperture-mcp
 
 test:
 	go test ./... && go vet ./...
