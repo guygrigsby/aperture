@@ -1,4 +1,4 @@
-.PHONY: run test exercise
+.PHONY: run test exercise clean
 
 # The server writes its endpoint here on startup (its default, in the gitignored
 # tsnet state dir); `make exercise` reads it. Override with APERTURE_ADDR_FILE.
@@ -21,3 +21,7 @@ test:
 #   make exercise TS_AUTHKEY_CLIENT=tskey-auth-...
 exercise:
 	go run ./integration/client "$${ENDPOINT:-$$(cat $(ADDR_FILE))}"
+
+# Remove the built binary and local tsnet node state (server and client).
+clean:
+	rm -rf aperture-mcp tsnet-state tsnet-client-state
