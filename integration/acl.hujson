@@ -1,0 +1,29 @@
+// Least-privilege tailnet policy for the aperture-mcp integration test.
+// Add these stanzas to your tailnet policy (Admin console > Access controls).
+//
+// Effect:
+//   - Two dedicated tags for two disposable, ephemeral test nodes.
+//   - The ONLY grant: client -> server, port 80 only, with a read-only app cap.
+//   - No grant gives tag:aperture-mcp any egress, so the server node can reach
+//     nothing on the tailnet; it can only be dialed by the client on :80.
+//   - Blast radius if a node or key leaks: "can be dialed on :80 by one tag."
+//     No lateral movement, no user identity, no standing access.
+{
+  "tagOwners": {
+    "tag:aperture-mcp":    ["autogroup:admin"],
+    "tag:aperture-client": ["autogroup:admin"]
+  },
+
+  "grants": [
+    {
+      "src": ["tag:aperture-client"],
+      "dst": ["tag:aperture-mcp"],
+      "ip":  ["80"],
+      "app": {
+        "grigsby.dev/cap/aperture-mcp": [
+          { "caps": ["resource:read"] }
+        ]
+      }
+    }
+  ]
+}
