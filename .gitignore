@@ -3,3 +3,17 @@ email.md
 
 # working scaffolding, not a deliverable
 docs/plans/
+
+# tsnet state and auth material, never commit
+/tsnet-state/
+*.authkey
+
+# build artifacts (anchored so they don't match cmd/ source dirs)
+/aperture-mcp
+/testclient
+
+# runtime, not shipped
+policy.json
+
+# integration node state (ephemeral)
+/tsnet-client-state/
